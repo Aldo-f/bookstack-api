@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   cleanup of created resources via `t.Cleanup`.
 - Husky pre-commit hook running `go vet`, `go build`, and `go test -short`.
 - Compatibility section in README documenting BookStack 26.05.5 response shapes.
+- File attachment upload support: `Attachments.Create` now accepts `File io.Reader`
+  and `Filename` fields to upload files via `multipart/form-data`. Unit test
+  `TestAttachmentsService_CreateFileUpload` and live test
+  `TestVerifyLiveAttachmentsFileUpload` verify the feature.
 
 ## [v0.1.0] - 2026-10-06
 
