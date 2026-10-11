@@ -7,6 +7,29 @@
 
 A Go client library for the [BookStack](https://www.bookstackapp.com/) REST API. Zero external dependencies.
 
+## Agent Quick Reference
+
+If you are an AI agent using this library, set these env vars first:
+
+```bash
+export BOOKSTACK_API_URL="https://docs.example.com"
+export BOOKSTACK_TOKEN_ID="your-token-id"
+export BOOKSTACK_TOKEN_SECRET="your-token-secret"
+```
+
+Then the client pattern is:
+
+```go
+client, err := bookstack.NewClient(bookstack.Config{
+    BaseURL:     os.Getenv("BOOKSTACK_API_URL"),
+    TokenID:     os.Getenv("BOOKSTACK_TOKEN_ID"),
+    TokenSecret: os.Getenv("BOOKSTACK_TOKEN_SECRET"),
+})
+if err != nil { log.Fatal(err) }
+```
+
+Pagination uses Go 1.23+ iterators — iterate with `for x, err := range svc.ListAll(ctx)`.
+
 ## Installation
 
 ```bash
@@ -22,13 +45,14 @@ import (
     "context"
     "fmt"
     "log"
+    "os"
 
     bookstack "code.beautifulmachines.dev/jakoubek/bookstack-api"
 )
 
 func main() {
     client, err := bookstack.NewClient(bookstack.Config{
-        BaseURL:     "https://docs.example.com",
+        BaseURL:     os.Getenv("BOOKSTACK_API_URL"),
         TokenID:     os.Getenv("BOOKSTACK_TOKEN_ID"),
         TokenSecret: os.Getenv("BOOKSTACK_TOKEN_SECRET"),
     })
@@ -53,9 +77,10 @@ func main() {
 
 BookStack uses token-based authentication. Create an API token in your BookStack user profile under **API Tokens**.
 
-Set the token ID and secret as environment variables:
+Set the instance URL and token as environment variables (these names are used by the examples and the live tests):
 
 ```bash
+export BOOKSTACK_API_URL="https://docs.example.com"
 export BOOKSTACK_TOKEN_ID="your-token-id"
 export BOOKSTACK_TOKEN_SECRET="your-token-secret"
 ```
