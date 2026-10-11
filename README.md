@@ -171,6 +171,70 @@ if errors.Is(err, bookstack.ErrNotFound) {
 | `Attachments` | List, Get, Create, Update, Delete |
 | `Comments` | List, Get, Create, Update, Delete |
 
+## CLI Tool (hqcli)
+
+A standalone CLI binary for quick BookStack operations — useful for agents and automation.
+
+### Installation
+
+```bash
+cd cli
+go build -o hqcli .
+# Or install globally
+go install code.beautifulmachines.dev/jakoubek/bookstack-api-cli@latest
+```
+
+### Usage
+
+```bash
+# Set credentials (or use env vars: BOOKSTACK_API_URL, BOOKSTACK_TOKEN_ID, BOOKSTACK_TOKEN_SECRET)
+export BOOKSTACK_API_URL="https://docs.example.com"
+export BOOKSTACK_TOKEN_ID="your-token-id"
+export BOOKSTACK_TOKEN_SECRET="your-token-secret"
+
+# List books (JSON output)
+hqcli books list --json
+
+# Get a page
+hqcli pages get 42 --json
+
+# Search
+hqcli search "deployment guide" --json
+
+# Create a page
+hqcli pages create --book-id=1 --name="New Page" --markdown="# Hello\n\nContent"
+
+# Update a page
+hqcli pages update 42 --name="Updated" --markdown="# New content"
+
+# Delete a page
+hqcli pages delete 42
+
+# Upload a file attachment
+hqcli attachments create --name="Report" --file=report.pdf --uploaded-to=42 --json
+```
+
+### Common Flags
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Machine-parseable JSON output |
+| `--all` | Iterate all pages (pagination) |
+| `--count N` | Limit results (default: 50) |
+| `--offset N` | Pagination offset |
+| `--sort FIELD` | Sort field (prefix with `-` for desc) |
+| `--filter KEY=VALUE` | Filter (repeatable) |
+
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Generic error / usage |
+| 2 | Not found (404) |
+| 3 | Auth error (401/403) |
+| 4 | Rate limited (429) |
+
 ## File Attachments
 
 Attachments can be created as **links** or **file uploads**:
