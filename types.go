@@ -3,6 +3,7 @@ package bookstack
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -144,10 +145,16 @@ type Attachment struct {
 }
 
 // AttachmentCreateRequest contains fields for creating an attachment.
+//
+// For link attachments, set Link and leave File nil — the request is sent as JSON.
+// For file attachments, set File and Filename and leave Link empty — the request
+// is sent as multipart/form-data.
 type AttachmentCreateRequest struct {
 	Name       string `json:"name"`
 	UploadedTo int    `json:"uploaded_to"`
 	Link       string `json:"link,omitempty"`
+	File       io.Reader `json:"-"`
+	Filename   string   `json:"-"`
 }
 
 // AttachmentUpdateRequest contains fields for updating an attachment.

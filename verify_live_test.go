@@ -13,6 +13,7 @@ package bookstack
 // it created, so the test leaves no trace on the instance.
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"strings"
@@ -346,5 +347,51 @@ func TestVerifyLiveAttachments(t *testing.T) {
 	}
 	if _, err := client.Attachments.Get(ctx, att.ID); err == nil {
 		t.Error("Attachments.Get after delete should fail")
+	}
+}
+
+func TestVerifyLiveAttachmentsFileUpload(t *testing.T) {
+	client := liveClient(t)
+	ctx := context.Background()
+
+	pages, err := client.Pages.List(ctx, nil)
+	if err != nil {
+		t.Fatalf("Pages.List: %v", err)
+	}
+	if len(pages) == 0 {
+		t.Fatal("expected at least one page for attachments")
+	}
+
+	// Create a file attachment
+	fileContent := []byte("Live test file content (auto-cleaned)")
+	att, err := client.Attachments.Create(ctx, &AttachmentCreateRequest{
+		Name:       "live-test-file.txt",
+		UploadedTo: pages[0].ID,
+		File:       bytes.NewReader(fileContent),
+		Filename:   "live-test-file.txt",
+	})
+	if err != nil {
+		t.Fatalf("Attachments.Create (file): %v", err)
+	}
+	t.Cleanup(func() {
+		if err := client.Attachments.Delete(context.Background(), att.ID); err != nil {
+			t.Logf("cleanup: Attachments.Delete(%d): %v", att.ID, err)
+		}
+	})
+
+	if att.ID == 0 {
+		t.Fatal("Attachments.Create (file) returned zero ID")
+	}
+	if att.External {
+		t.Error("File attachment should have External=false")
+	}
+
+	// Get and verify
+	got, err := client.Attachments.Get(ctx, att.ID)
+	if err != nil {
+		t.Fatalf("Attachments.Get (file): %v", err)
+	}
+	if got.ID != att.ID {
+		t.Errorf("Attachments.Get ID = %d, want %d", got.ID, att.ID)
 	}
 }
