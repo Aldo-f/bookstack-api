@@ -134,7 +134,7 @@ if errors.Is(err, bookstack.ErrNotFound) {
 }
 ```
 
-## Available Services
+### Available Services
 
 | Service | Operations |
 |---------|-----------|
@@ -146,6 +146,29 @@ if errors.Is(err, bookstack.ErrNotFound) {
 | `Attachments` | List, Get, Create, Update, Delete |
 | `Comments` | List, Get, Create, Update, Delete |
 
+## File Attachments
+
+Attachments can be created as **links** or **file uploads**:
+
+```go
+// Link attachment (JSON)
+linkAtt, err := client.Attachments.Create(ctx, &bookstack.AttachmentCreateRequest{
+    Name:       "Documentation",
+    UploadedTo: pageID,
+    Link:       "https://example.com/doc.pdf",
+})
+
+// File upload (multipart/form-data)
+fileAtt, err := client.Attachments.Create(ctx, &bookstack.AttachmentCreateRequest{
+    Name:       "Report",
+    UploadedTo: pageID,
+    File:       bytes.NewReader(fileData),
+    Filename:   "report.pdf",
+})
+```
+
+When `File` and `Filename` are provided, the library automatically uses multipart form-data encoding.
+
 ## Requirements
 
 - Go 1.23+
@@ -153,7 +176,7 @@ if errors.Is(err, bookstack.ErrNotFound) {
 
 ## Issue Tracking
 
-This repository uses [Beads](https://github.com/steveyegge/beads) (bd) for issue tracking — issues live in the repo at `.beads/` alongside the code.
+This repository uses [Beads](https://github.com/gastownhall/beads) (bd) for issue tracking — issues live in the repo at `.beads/` alongside the code.
 
 Install:
 
@@ -161,8 +184,14 @@ Install:
 # macOS / Linux (Homebrew)
 brew install beads
 
-# Or build from source
-go install github.com/steveyegge/beads/cmd/bd@latest
+# Or download pre-built binary (fastest, no Go toolchain needed)
+curl -L -o bd.tar.gz https://github.com/gastownhall/beads/releases/download/v1.3.1/beads_1.3.1_$(uname -s)_$(uname -m).tar.gz
+tar -xzf bd.tar.gz bd
+sudo mv bd /usr/local/bin/
+rm bd.tar.gz
+
+# Or build from source (requires Go)
+go install github.com/gastownhall/beads/cmd/bd@latest
 ```
 
 Then run `bd onboard` to get started.
